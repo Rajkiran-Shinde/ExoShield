@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExoShield System Dashboard</title>
+    
+    <!-- Montserrat Font link -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js link -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            /* Exact colors matched from the mockup */
+            --exo-red: #B52226; 
+            --exo-green: #377B31;
+            --exo-yellow: #ECA42A;
+            --exo-dark: #4A4A4A;
+            --bg-color: #F4F5F5; 
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100vh;
+            font-family: 'Montserrat', sans-serif;
+            overflow: hidden; /* Prevents scrolling */
+            
+            background-color: var(--bg-color);
+            background-repeat: no-repeat;
+        }
+
+        .dashboard-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 1300px;
+            margin: 0 auto;
+            height: 100vh; 
+            padding: 25px 50px; 
+            box-sizing: border-box;
+        }
+
+        /* Header Styling */
+        .header {
+            display: flex;
+            justify-content: space-between; 
+            align-items: center;
+            margin-bottom: 30px; 
+            margin-top: 10px;
+        }
+
+        .title {
+            font-size: 34px; 
+            font-weight: 800; 
+            white-space: nowrap;
+            letter-spacing: -0.5px;
+        }
+
+        .title .exo { color: var(--exo-red); }
+        .title .shield { color: var(--exo-green); }
+        .title .system { color: var(--exo-yellow); }
+        .title .dashboard { color: var(--exo-dark); }
+
+        .logo {
+            height: 100px; 
+            object-fit: contain;
+            cursor: pointer; 
+            transition: transform 0.2s ease;
+        }
+        
+        .logo:hover {
+            transform: scale(1.05); 
+        }
+
+        /* Value Display Styling */
+        .status-values {
+            display: flex;
+            justify-content: space-between;
+            gap: 25px;
+            margin-bottom: 25px; 
+        }
+
+        .value-box {
+            flex: 1;
+            height: 95px; 
+            padding: 12px 20px;
+            background: transparent;
+            border: 1px solid #222; 
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .label {
+            font-weight: 600;
+            font-size: 18px; 
+            color: var(--exo-red);
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            align-self: flex-start;
+        }
+
+        .value {
+            font-size: 48px; 
+            font-weight: 800;
+            color: var(--exo-green); 
+            align-self: flex-end;
+            line-height: 1;
+            letter-spacing: -1px;
+            transition: color 0.3s ease; 
+        }
+
+        /* Chart Area Styling */
+        .chart-section {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0; 
+            margin-bottom: 10px;
+        }
+
+        .chart-box {
+            flex-grow: 1;
+            border: 1px solid #222;
+            border-radius: 10px;
+            padding: 10px 25px 15px 25px;
+            background-color: transparent;
+            display: flex;
+            flex-direction: column;
+            min-height: 0; 
+        }
+
+        .chart-title {
+            text-align: center;
+            color: #555;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .chart-wrapper {
+            flex-grow: 1;
+            position: relative;
+            min-height: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* Modal Styling */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0; 
+            top: 0;
+            width: 100%; 
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); 
+            justify-content: center; 
+            align-items: center;
+            backdrop-filter: blur(3px); 
+        }
+
+        .modal-content {
+            background-color: #fff; 
+            padding: 30px; 
+            border-radius: 12px;
+            width: 320px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            font-family: 'Montserrat', sans-serif;
+            text-align: left;
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            color: var(--exo-dark);
+            font-weight: 800;
+            border-bottom: 2px solid var(--exo-red);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .modal-content label {
+            display: block; 
+            margin-top: 15px; 
+            font-weight: 700; 
+            color: #333; 
+            font-size: 14px;
+        }
+
+        .modal-content input {
+            width: 100%; 
+            padding: 10px; 
+            margin-top: 8px; 
+            box-sizing: border-box; 
+            border: 1px solid #ccc; 
+            border-radius: 6px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 16px;
+        }
+        
+        .modal-content input:focus {
+            outline: none;
+            border-color: var(--exo-green);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px; 
+            border: none; 
+            border-radius: 6px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            font-family: 'Montserrat', sans-serif;
+            transition: opacity 0.2s;
+        }
+
+        .modal-btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn-save { background-color: var(--exo-green); color: white; }
+        .btn-cancel { background-color: #ccc; color: #333; }
+
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <div class="header">
+            <div class="title">
+                <span class="exo">EXO</span>
+                <span class="shield">SHIELD</span>
+                <span class="system">SYSTEM</span>
+                <span class="dashboard">DASHBOARD</span>
+            </div>
+            <!-- FIXED: Capital 'L' in Logo.png so it matches the LittleFS file perfectly -->
+            <img src="Logo.png" alt="ExoShield Logo" class="logo" onclick="openSettings()" title="Click for Settings">
+        </div>
+
+        <div class="status-values">
+            <div class="value-box">
+                <div class="label">
+                    <span>Current Temp</span>
+                    <span style="font-size: 16px;">🌡️</span>
+                </div>
+                <div class="value" id="currentTemp">-- C</div>
+            </div>
+            <div class="value-box">
+                <div class="label">
+                    <span>Pump Status</span>
+                    <span style="font-size: 16px;">💧</span>
+                </div>
+                <div class="value" id="pumpStatus">--</div>
+            </div>
+            <div class="value-box">
+                <div class="label">
+                    <span>Temp Sensor Health</span>
+                </div>
+                <div class="value" id="sensorHealth">--%</div>
+            </div>
+        </div>
+
+        <div class="chart-section">
+            <div class="chart-box">
+                <div class="chart-title">Time Vs Temp Graph</div>
+                <div class="chart-wrapper">
+                    <canvas id="temperatureChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal Area -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <h2>System Settings</h2>
+            
+            <label for="tempThreshInput">Max Temp Threshold (°C)</label>
+            <input type="number" id="tempThreshInput" placeholder="e.g., 40">
+            
+            <label for="healthThreshInput">Min Health Threshold (%)</label>
+            <input type="number" id="healthThreshInput" placeholder="e.g., 50">
+            
+            <div class="modal-buttons">
+                <button class="modal-btn btn-cancel" onclick="closeSettings()">Cancel</button>
+                <button class="modal-btn btn-save" onclick="saveSettings()">Save</button>
+            </div>
+        </div>
+    </div>
+
+   <!-- ... Leave all the HTML and CSS above exactly the same ... -->
+    <script>
+        // --- SETTINGS & THRESHOLDS ---
+        let maxTempThreshold = 40; 
+        let minHealthThreshold = 50; 
+
+        let lastKnownTemp = 0;
+        let lastKnownPump = "OFF";
+        let lastKnownHealth = 100;
+
+        function openSettings() {
+            document.getElementById('tempThreshInput').value = maxTempThreshold;
+            document.getElementById('healthThreshInput').value = minHealthThreshold;
+            document.getElementById('settingsModal').style.display = 'flex';
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsModal').style.display = 'none';
+        }
+
+        function saveSettings() {
+            let newTemp = parseFloat(document.getElementById('tempThreshInput').value);
+            let newHealth = parseFloat(document.getElementById('healthThreshInput').value);
+            
+            if(!isNaN(newTemp)) maxTempThreshold = newTemp;
+            if(!isNaN(newHealth)) minHealthThreshold = newHealth;
+
+            try {
+                fetch('/update?threshold=' + maxTempThreshold, { method: 'POST' }).catch(e => console.warn('Update endpoint not reachable.'));
+            } catch(e) {}
+
+            closeSettings();
+            updateDashboard(lastKnownTemp, lastKnownPump, lastKnownHealth);
+        }
+
+        // --- OPTIMIZED CHART CONFIGURATION ---
+        const ctx = document.getElementById('temperatureChart').getContext('2d');
+        const config = {
+            type: 'line',
+            data: {
+                labels: [], 
+                datasets: [{
+                    label: 'Temperature', 
+                    data: [], 
+                    fill: true, 
+                    backgroundColor: 'rgba(25, 100, 126, 0.15)', 
+                    borderColor: '#19647E', 
+                    pointRadius: 4,
+                    pointBackgroundColor: '#ffffff', 
+                    pointBorderColor: '#19647E', 
+                    borderWidth: 2, 
+                    tension: 0.2 // Lower tension = less math for the browser
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false, // CRITICAL FIX: Turns off heavy animations for instant rendering
+                plugins: {
+                    title: { display: false },
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        labels: { color: '#555', font: { family: 'Montserrat', size: 12, weight: '600' } }
+                    }
+                },
+                scales: {
+                    x: { grid: { display: false }, ticks: { color: '#666' } },
+                    y: {
+                        min: 0, max: 60, 
+                        grid: { color: 'rgba(0,0,0,0.06)' }, 
+                        ticks: { stepSize: 10, color: '#666', callback: function(value) { return value + " °C"; } }
+                    }
+                }
+            }
+        };
+
+        const myChart = new Chart(ctx, config);
+
+        // --- ESP8266 INTERACTION FUNCTIONS ---
+        function updateDashboard(temp, pump, health) {
+            lastKnownTemp = temp; lastKnownPump = pump; lastKnownHealth = health;
+
+            const tempEl = document.getElementById('currentTemp');
+            const pumpEl = document.getElementById('pumpStatus');
+            const healthEl = document.getElementById('sensorHealth');
+
+            tempEl.innerText = temp !== "--" ? temp + " C" : "-- C";
+            pumpEl.innerText = pump;
+            healthEl.innerText = health !== "--" ? health + "%" : "--%";
+
+            if (temp === "--") {
+                tempEl.style.color = 'var(--exo-dark)'; pumpEl.style.color = 'var(--exo-dark)'; healthEl.style.color = 'var(--exo-dark)';
+                return;
+            }
+
+            tempEl.style.color = (temp >= maxTempThreshold) ? 'var(--exo-red)' : 'var(--exo-green)';
+            pumpEl.style.color = (pump.toUpperCase() === 'ON') ? 'var(--exo-green)' : 'var(--exo-red)';
+            healthEl.style.color = (health <= minHealthThreshold) ? 'var(--exo-red)' : 'var(--exo-green)';
+        }
+
+        function addChartData(timeString, temperatureValue) {
+            myChart.data.labels.push(timeString);
+            myChart.data.datasets[0].data.push(temperatureValue);
+
+            if (myChart.data.labels.length > 15) {
+                myChart.data.labels.shift();
+                myChart.data.datasets[0].data.shift();
+            }
+            myChart.update();
+        }
+
+        // --- RELIABLE DATA FETCHING ---
+        function fetchLiveData() {
+            // Added a cache-busting timestamp so the browser doesn't load old data
+            fetch('/data?t=' + new Date().getTime())
+            .then(response => {
+                if (!response.ok) throw new Error("Network response not ok");
+                return response.json();
+            })
+            .then(data => {
+                let pumpString = data.pump ? "ON" : "OFF";
+                maxTempThreshold = data.threshold; 
+
+                updateDashboard(data.temp, pumpString, data.health);
+                
+                const now = new Date();
+                const timeString = now.getHours().toString().padStart(2, '0') + ':' + 
+                                   now.getMinutes().toString().padStart(2, '0') + ':' + 
+                                   now.getSeconds().toString().padStart(2, '0');
+                
+                if (data.temp > -100) {
+                    addChartData(timeString, data.temp);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching live data:', error);
+                updateDashboard("--", "ERR", "--");
+            });
+        }
+
+        // Wait 2 FULL seconds for images to finish downloading before starting data fetch
+        setTimeout(() => {
+            fetchLiveData();
+            // RELIABILITY FIX: Ask for data every 3 seconds instead of 1 second
+            setInterval(fetchLiveData, 3000); 
+        }, 2000);
+    </script>
+</body>
+</html>
