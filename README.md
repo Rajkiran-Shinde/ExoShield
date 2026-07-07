@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="Images/Logo.png" alt="ExoShield Logo" width="180"/>
+<img src="data/Logo.png" alt="ExoShield Logo" width="180"/>
 
 # ExoShield: Smart Temperature Control System
 
@@ -20,22 +20,26 @@
 
 # Table of Contents
 
-- Introduction
-- Why ExoShield?
-- The Problem
-- Project Objectives
-- Key Features
-- Credits
-- Hardware Overview
-- Software Stack
-- Firmware Architecture
-- Technical Deep Dive
-- Project Gallery
-- Installation
-- Folder Structure
-- Future Scope
-- Contributing
-- License
+## Table of Contents
+
+- [Introduction](#introduction)
+- [Why ExoShield?](#why-exoshield)
+- [The Problem](#the-problem)
+- [Project Objectives](#project-objectives)
+- [Key Features](#key-features)
+- [Credits](#credits)
+- [Hardware Architecture](#hardware-architecture)
+- [System Architecture](#system-architecture)
+- [Hardware Components](#hardware-components)
+- [GPIO Pin Mapping](#gpio-pin-mapping)
+- [Software Architecture](#software-architecture)
+- [Firmware Engineering and Technical Deep Dive](#firmware-engineering-and-technical-deep-dive)
+- [Project Gallery](#project-gallery)
+- [Installation](#installation)
+- [Project Structure](#project-structure)
+- [Contributing](#contributing)
+- [Final Remarks](#final-remarks)
+- [License](#license)
 
 ---
 
@@ -911,5 +915,16 @@ Potential future developments include:
 - Industrial Modbus communication
 
 These enhancements can be integrated with minimal changes to the existing architecture due to the modular design philosophy adopted throughout the project.
+
+---
+# Final Remarks
+
+ExoShield represents more than an embedded systems project—it demonstrates how accessible technologies can be applied to solve real industrial safety challenges. By combining affordable hardware, robust firmware, and an intuitive web interface, the project aims to make intelligent reactor monitoring and automatic protection available to industries where conventional safety systems may be economically impractical.
+
+The project has been developed with a strong emphasis on reliability, modularity, and maintainability. Every design decision, from the asynchronous firmware architecture to the protection algorithms implemented for the cooling system, reflects the objective of building a practical solution that can evolve into a deployable industrial product.
+
+As an open-source initiative, ExoShield welcomes contributions from students, researchers, embedded engineers, and industry professionals. Whether your interest lies in embedded firmware, industrial automation, web technologies, or process safety, your ideas and contributions can help improve the system and expand its real-world impact.
+
+If you find this project useful or inspiring, consider starring the repository and sharing your feedback. Every contribution, suggestion, and discussion helps move the project one step closer to making industrial safety more accessible through open engineering.
 
 ---
